@@ -28,6 +28,7 @@ import ly.img.android.pesdk.backend.model.state.VideoCompositionSettings
 import ly.img.android.pesdk.backend.model.state.manager.SettingsList
 import ly.img.android.pesdk.backend.model.state.manager.StateHandler
 import ly.img.android.pesdk.ui.activity.VideoEditorActivity
+import ly.img.android.pesdk.ui.model.state.UiConfigAspect
 import ly.img.android.pesdk.utils.ThreadUtils
 import ly.img.android.serializer._3.IMGLYFileWriter
 
@@ -133,6 +134,12 @@ class FlutterVESDK: FlutterIMGLY() {
     val settingsList = VideoEditorSettingsList(createTemporaryFiles)
     configuration.applyOn(settingsList)
     currentConfig = configuration
+
+    if(configuration.forceCrop == true) {
+      settingsList.configure<UiConfigAspect> {
+        it.forceCropMode = UiConfigAspect.ForceCrop.SHOW_TOOL_WHEN_CROP_UNMATCHED
+      }
+    }
 
     settingsList.configure<LoadSettings> { loadSettings ->
       asset.also {
