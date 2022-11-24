@@ -18,7 +18,7 @@ class VESDK {
   /// to include one license for each platform with the same name, but where
   /// the iOS license has `.ios` as its file extension and the
   /// Android license has `.android` as its file extension.
-  static void unlockWithLicense(String path) async {
+  static Future<void> unlockWithLicense(String path) async {
     await _channel.invokeMethod('unlock', <String, dynamic>{'license': path});
   }
 
@@ -31,8 +31,7 @@ class VESDK {
   /// Once finished, the editor either returns a [VideoEditorResult]
   /// or `null` if the editor was dismissed without exporting the video.
   static Future<VideoEditorResult?> openEditor(Video video,
-      {Configuration? configuration,
-      Map<String, dynamic>? serialization}) async {
+      {Configuration? configuration, Map<String, dynamic>? serialization}) async {
     final result = await _channel.invokeMethod('openEditor', <String, dynamic>{
       'video': video._toJson(),
       'configuration': configuration?.toJson(),
@@ -42,9 +41,7 @@ class VESDK {
               ? serialization
               : jsonEncode(serialization)
     });
-    return result == null
-        ? null
-        : VideoEditorResult._fromJson(Map<String, dynamic>.from(result));
+    return result == null ? null : VideoEditorResult._fromJson(Map<String, dynamic>.from(result));
   }
 }
 
@@ -109,8 +106,7 @@ class Video {
     } else {
       map.addAll({
         "videos": _videos,
-        "size":
-            size == null ? null : {"width": size.width, "height": size.height}
+        "size": size == null ? null : {"width": size.width, "height": size.height}
       });
     }
     return map..removeWhere((key, value) => value == null);
@@ -141,13 +137,9 @@ class VideoEditorResult {
 
   /// Creates a [VideoEditorResult] from the [json] map.
   factory VideoEditorResult._fromJson(Map<String, dynamic> json) =>
-      VideoEditorResult._(
-          json["video"], json["hasChanges"], json["serialization"]);
+      VideoEditorResult._(json["video"], json["hasChanges"], json["serialization"]);
 
   /// Converts the [VideoEditorResult] for JSON parsing.
-  Map<String, dynamic> toJson() => {
-        "video": video,
-        "hasChanges": hasChanges,
-        "serialization": serialization
-      };
+  Map<String, dynamic> toJson() =>
+      {"video": video, "hasChanges": hasChanges, "serialization": serialization};
 }
