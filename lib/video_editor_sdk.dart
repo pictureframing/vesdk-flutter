@@ -17,7 +17,7 @@ class VESDK {
   /// to include one license for each platform with the same name, but where
   /// the iOS license has `.ios` as its file extension and the
   /// Android license has `.android` as its file extension.
-  static void unlockWithLicense(String path) async {
+  static Future<void> unlockWithLicense(String path) async {
     await _channel.invokeMethod('unlock', <String, dynamic>{'license': path});
   }
 
@@ -30,8 +30,7 @@ class VESDK {
   /// Once finished, the editor either returns a [VideoEditorResult]
   /// or `null` if the editor was dismissed without exporting the video.
   static Future<VideoEditorResult?> openEditor(Video video,
-      {Configuration? configuration,
-      Map<String, dynamic>? serialization}) async {
+      {Configuration? configuration, Map<String, dynamic>? serialization}) async {
     final result = await _channel.invokeMethod('openEditor', <String, dynamic>{
       'video': video._toJson(),
       'configuration': configuration?.toJson(),
@@ -43,13 +42,12 @@ class VESDK {
     });
     final segmentsEnabled = configuration?.export?.video?.segments == true;
     final release = segmentsEnabled && Platform.isAndroid
-        ? () => _channel.invokeMethod(
-            'release', <String, dynamic>{"identifier": result["identifier"]})
+        ? () =>
+            _channel.invokeMethod('release', <String, dynamic>{"identifier": result["identifier"]})
         : () => null;
     return result == null
         ? null
-        : VideoEditorResult._fromJson(Map<String, dynamic>.from(result),
-            release: release);
+        : VideoEditorResult._fromJson(Map<String, dynamic>.from(result), release: release);
   }
 }
 
@@ -82,8 +80,7 @@ class VideoSegment {
 
   /// Creates a [VideoSegment] from the [json] map.
   factory VideoSegment.fromJson(Map<String, dynamic> json) =>
-      VideoSegment(json["videoUri"],
-          startTime: json["startTime"], endTime: json["endTime"]);
+      VideoSegment(json["videoUri"], startTime: json["startTime"], endTime: json["endTime"]);
 }
 
 /// A [Video] can be loaded into the VideoEditor SDK editor.
@@ -168,14 +165,12 @@ class Video {
     } else if (_videos != null) {
       map.addAll({
         "videos": _videos,
-        "size":
-            size == null ? null : {"width": size.width, "height": size.height}
+        "size": size == null ? null : {"width": size.width, "height": size.height}
       });
     } else if (_segments != null) {
       map.addAll({
         "segments": _segments?.map((e) => e.toJson()).toList(),
-        "size":
-            size == null ? null : {"width": size.width, "height": size.height}
+        "size": size == null ? null : {"width": size.width, "height": size.height}
       });
     }
     return map..removeWhere((key, value) => value == null);
@@ -218,21 +213,16 @@ class VideoEditorResult {
   final VoidCallback release;
 
   /// Creates a [VideoEditorResult] from the [json] map.
-  factory VideoEditorResult._fromJson(Map<String, dynamic> json,
-      {required VoidCallback release}) {
+  factory VideoEditorResult._fromJson(Map<String, dynamic> json, {required VoidCallback release}) {
     final serializedSegments = json["segments"] as List<dynamic>?;
     final deserializedSegments = serializedSegments
         ?.map((e) => VideoSegment.fromJson(Map<String, dynamic>.from(e)))
         .toList();
     final serializedSize = Map<String, dynamic>.from(json["videoSize"]);
-    final deserializedSize =
-        Size(serializedSize["width"], serializedSize["height"]);
+    final deserializedSize = Size(serializedSize["width"], serializedSize["height"]);
 
-    return VideoEditorResult._(
-        json["video"], json["hasChanges"], json["serialization"],
-        segments: deserializedSegments,
-        videoSize: deserializedSize,
-        release: release);
+    return VideoEditorResult._(json["video"], json["hasChanges"], json["serialization"],
+        segments: deserializedSegments, videoSize: deserializedSize, release: release);
   }
 
   /// Converts the [VideoEditorResult] for JSON parsing.

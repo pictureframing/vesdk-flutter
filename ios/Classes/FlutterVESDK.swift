@@ -50,6 +50,7 @@ public class FlutterVESDK: FlutterIMGLY, FlutterPlugin, VideoEditViewControllerD
             guard let license = arguments["license"] as? String else { return }
             self.result = result
             self.unlockWithLicense(with: license)
+            result(nil)
         } else if call.method == "release" {
             result(nil)
         } else {
