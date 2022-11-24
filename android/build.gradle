@@ -35,6 +35,7 @@ imglyConfig {
 
     modules {
         include 'ui:core'
+        include 'ui:transform'
         include 'backend:config-loader'
     }
 }
