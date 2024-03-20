@@ -2,16 +2,20 @@ group 'ly.img.flutter.video_editor_sdk'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.5.32'
+    ext.kotlin_version = '1.7.10'
+    ext.pesdk_version = '10.9.0' // Insert the latest SDK version here. You will find it here https://github.com/imgly/pesdk-android-demo/releases
 
     repositories {
         google()
+        gradlePluginPortal()
         mavenCentral()
+        maven { url 'https://artifactory.img.ly/artifactory/imgly' }
+
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath "ly.img.android.pesdk:plugin:$pesdk_version"
     }
 }
 
@@ -26,7 +30,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'ly.img.android.sdk'
 
-imglyConfig {
+IMGLY.configure {
     vesdk {
         enabled true
     }
@@ -40,7 +44,7 @@ imglyConfig {
     }
 }
 
-def MIN_LY_IMG_ANDROID_SDK_PLUGIN_VERSION = "10.4.1"
+def MIN_LY_IMG_ANDROID_SDK_PLUGIN_VERSION = "10.9.0"
 
 task checkVersion {
     if (imglyConfig.convertToVersionNumber(imglyConfig.getVersion()) < imglyConfig.convertToVersionNumber(MIN_LY_IMG_ANDROID_SDK_PLUGIN_VERSION)) {
@@ -59,14 +63,29 @@ task checkVersion {
 preBuild.dependsOn checkVersion
 
 android {
-    compileSdkVersion 31
+    if (project.android.hasProperty("namespace")) {
+        namespace "ly.img.flutter.video_editor_sdk"
+    }
+
+    compileSdk 34
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
     defaultConfig {
         minSdkVersion 21
     }
+    
     lintOptions {
         disable 'InvalidPackage'
     }
