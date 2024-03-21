@@ -3,6 +3,7 @@ description: The official Flutter plugin for VideoEditor SDK. Integrate the vide
 version: 3.0.0+1
 homepage: https://img.ly/products/video-sdk
 repository: https://github.com/imgly/vesdk-flutter
+publish_to: none
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -11,7 +12,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  imgly_sdk: 3.0.0
+  imgly_sdk:
+    git:
+      url: https://github.com/pictureframing/imgly-flutter
+      ref:  v3.0.0+1-PF
 
 dev_dependencies:
   flutter_test:
